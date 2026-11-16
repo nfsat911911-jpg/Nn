@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12516b">
+<title>مختبر الأرض الحيّة 3D | علوم خامس</title>
+<style>
+:root{font-family:system-ui,Tahoma,Arial,sans-serif;color:#193849;background:#f0f6f7}
+*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}
+header{background:linear-gradient(115deg,#123f59,#168b91);color:white;padding:14px 16px}h1{font-size:21px;margin:0 0 4px}header p{margin:0;color:#d6f2f2;font-size:12px}
+main{max-width:980px;margin:auto;background:white;min-height:100vh;box-shadow:0 0 28px #1234}
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:8px;background:#edf5f6}
+nav button{border:1px solid #d4e4e8;background:white;color:#26495c;border-radius:10px;padding:9px 2px;font-size:11px;min-width:0}
+nav button .emoji{display:block;font-size:21px}nav button.active{background:#d7f0ef;border-color:#128c98;color:#075d70;font-weight:800}
+#sceneWrap{position:relative;height:min(53vh,490px);min-height:265px;background:#c4e3f0;overflow:hidden}
+#sceneWrap canvas{display:block;width:100%;height:100%;touch-action:none}
+.overlay{position:absolute;top:9px;right:9px;pointer-events:none;background:#fffffff0;padding:7px 9px;border-radius:9px;font-size:11px;line-height:1.5;color:#25566a}
+#meter{position:absolute;top:9px;left:9px;pointer-events:none;background:#fffef3ed;padding:7px 9px;border-radius:9px;font-size:11px;color:#594c35}
+.camera{position:absolute;bottom:10px;left:10px;display:flex;gap:5px;direction:ltr}
+.camera button{background:#fffffff2;color:#23536a;border:1px solid #b9d5dc;border-radius:9px;min-width:37px;height:38px;font-size:20px}
+#fallback{display:none;padding:28px;background:#fff1e5;color:#754d24;text-align:center}
+.info{padding:9px 14px;border-bottom:1px solid #e0eaec;font-size:12px;line-height:1.7}
+.controls{padding:13px 14px}h2{font-size:16px;margin:0 0 9px}.sliders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.field label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;gap:5px}.field output{color:#117e98;white-space:nowrap}
+.field input{width:100%;accent-color:#138b9a;margin:11px 0 5px}
+.question{font-size:12px;font-weight:800;margin:12px 0 6px}.choices{display:flex;gap:6px}
+.choices button{flex:1;border:1px solid #d5e4e7;background:#f5f9fa;border-radius:9px;padding:10px 4px;color:#25516a;font-size:11px}
+.choices button.sel{border-color:#108e9d;background:#d7f0f1;color:#07596e;font-weight:800}
+.actions{display:flex;gap:7px;margin-top:10px}.actions button{flex:1;padding:11px;border-radius:9px;border:1px solid #c9dfe4;background:white;color:#19566c;font-size:12px}
+.actions .go{background:#117f99;color:white;border-color:#117f99;font-weight:800}
+#result{margin-top:10px;background:#eff7f7;border-radius:10px;padding:11px;font-size:12px;line-height:1.8;min-height:43px}
+details{padding:12px 14px;border-top:1px solid #e1eaec;font-size:12px;line-height:1.8}summary{cursor:pointer;font-weight:800}
+.progress{height:8px;border-radius:8px;background:#dce9e9;overflow:hidden;margin:8px 0}.progress div{height:100%;width:0;background:#27a68c;transition:width .25s}
+footer{padding:10px 14px;color:#647b86;font-size:10px;line-height:1.7}
+@media(max-width:490px){h1{font-size:18px}nav button{font-size:9px}nav button .emoji{font-size:19px}.sliders{grid-template-columns:repeat(2,minmax(0,1fr))}#sceneWrap{height:310px;min-height:310px}.overlay{font-size:10px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+</head>
+<body>
+<main>
+<header><h1>🌍 مختبر الأرض الحيّة 3D</h1><p>علوم الصف الخامس | استكشفي العمليات المؤثرة في سطح الأرض</p></header>
+<nav id="tabs" aria-label="اختيار التجربة"></nav>
+<div id="sceneWrap"><div id="canvasHost"></div><div class="overlay">👆 اسحبي لتدوير الأرض<br>🤏 بإصبعين للتقريب</div><div id="meter">مؤشر التأثير: ٥٠٪</div>
+<div class="camera"><button id="left" aria-label="تدوير يسارًا">↶</button><button id="right" aria-label="تدوير يمينًا">↷</button><button id="out" aria-label="إبعاد">−</button><button id="in" aria-label="تقريب">+</button><button id="home" aria-label="المنظر الأصلي">⌂</button></div></div>
+<div id="fallback">تعذّر تشغيل المشهد الثلاثي الأبعاد. افتحي الرابط في Safari أو Chrome مع اتصال بالإنترنت.</div>
+<div class="info" id="intro"></div>
+<section class="controls"><h2 id="heading"></h2><div class="sliders" id="sliders"></div><div class="question">🔮 ما توقّعك مقارنةً بالمستوى المتوسط؟</div>
+<div class="choices" id="choices"><button data-choice="up">⬆ يزداد</button><button data-choice="down">⬇ يقل</button><button data-choice="same">↔ يبقى ثابتًا</button></div>
+<div class="actions"><button class="go" id="run">▶ تشغيل التجربة</button><button id="reset">↻ إعادة الضبط</button></div><div id="result" role="status">غيّري العوامل، ثم اختاري توقّعك وشغّلي التجربة.</div></section>
+<details><summary>📘 التفسير العلمي</summary><p id="lesson"></p></details>
+<details open><summary>🏡 تحدّي أنقذي القرية | <span id="progressLabel">٠ من ٥</span></summary>
+<div class="progress"><div id="progressFill"></div></div><p id="mission">أكملي التجارب الخمس، وقلّلي أخطار التعرية والزلازل والحمم إلى أقل من ٤٠٪.</p></details>
+<footer>المحاكاة التعليمية تعرض علاقات مبسّطة بين العوامل ولا تتنبأ بأخطار طبيعية حقيقية. تعمل دون حساب للطالبة؛ يتطلب تحميل المشهد اتصالًا بالإنترنت.</footer>
+</main>
+<script type="module">
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+const $=s=>document.querySelector(s);
+const ar=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[+d]);
+const experiments=[
+{icon:"🪨",name:"التجوية",heading:"🪨 تفتّت الصخور",intro:"تأمّلي الصخرة قرب الجبل. غيّري الحرارة والماء ولاحظي الشقوق.",keys:[["heat","تغيّر الحرارة"],["water","الماء في الشقوق"]],unit:"التفتّت",lesson:"التجوية هي تفتّت الصخور أو تغيّرها في مكانها دون انتقال الفتات.",calc:v=>Math.round(v.heat*.55+v.water*.45)},
+{icon:"🌧️",name:"التعرية",heading:"🌧️ تعرية التربة",intro:"راقبي الجبال والنهر والقرية. زيدي المطر والرياح ثم زيدي الغطاء النباتي.",keys:[["rain","شدة المطر"],["wind","قوة الرياح"],["plants","الغطاء النباتي"]],unit:"خطر التعرية",lesson:"التعرية نقل فتات الصخور والتربة بفعل الماء والرياح وغيرها. جذور النباتات تساعد على تثبيت التربة.",calc:v=>Math.round(Math.min(100,(v.rain*.65+v.wind*.35)*(1-v.plants*.0075)))},
+{icon:"🏝️",name:"الترسيب",heading:"🏝️ تراكم الرواسب",intro:"راقبي الرمال قرب نهاية النهر؛ بطء الماء يساعد على تراكم الرواسب.",keys:[["speed","سرعة الماء"],["sediment","كمية الرواسب"]],unit:"الترسيب",lesson:"الترسيب هو استقرار المواد المنقولة وتراكمها عندما تقل قدرة الماء أو الرياح على حملها.",calc:v=>Math.round((100-v.speed)*.6+v.sediment*.4)},
+{icon:"🏘️",name:"الزلازل",heading:"🏘️ اهتزاز القرية",intro:"قارني أثر قوة الاهتزاز وتدعيم المنازل على مقدار الضرر.",keys:[["quake","شدة الاهتزاز"],["support","تدعيم المباني"]],unit:"خطر المباني",lesson:"تحدث الزلازل نتيجة حركة مفاجئة للصخور على الصدوع. وقد يقلل التصميم الإنشائي الجيد من أضرارها.",calc:v=>Math.round(v.quake*.8+(100-v.support)*.2)},
+{icon:"🌋",name:"البراكين",heading:"🌋 ثوران البركان",intro:"راقبي تدفّق الحمم من فوهة البركان؛ غيّري قوة الاندفاع واللزوجة.",keys:[["eruption","قوة الاندفاع"],["viscosity","لزوجة الحمم"]],unit:"امتداد الحمم",lesson:"الحمم هي الصهارة التي تصل سطح الأرض، وتتأثر سرعة جريانها بلزوجتها وتضاريس المنطقة.",calc:v=>Math.round(v.eruption*.65+(100-v.viscosity)*.35)}
+];
+const states=experiments.map(e=>({values:Object.fromEntries(e.keys.map(k=>[k[0],50])),done:false,point:false,result:50}));
+let current=1,choice=null,animateQuakeUntil=0,scene,camera,renderer,controls,terrain,treesGroup,housesGroup,riverGroup,weatherGroup,lavaGroup,sedimentGroup,rockGroup,cloudGroup;
+function gaussian(x,z,cx,cz,sx,sz){return Math.exp(-((x-cx)**2/sx+(z-cz)**2/sz));}
+function riverX(z){return -.7+Math.sin(z*.6)*.85;}
+function height(x,z){return .15+2.75*gaussian(x,z,-5,-1,13,14)+1.35*gaussian(x,z,-2,4,20,11)+1.1*gaussian(x,z,5,-4,14,9)-.26*gaussian(x,z,riverX(z),z,1.2,100);}
+function material(color,extra={}){return new THREE.MeshStandardMaterial(Object.assign({color,roughness:.9},extra));}
+function mesh(geometry,mat,parent,x=0,y=0,z=0){const o=new THREE.Mesh(geometry,mat);o.position.set(x,y,z);parent.add(o);return o;}
+function disposeGroup(group){while(group.children.length){let o=group.children[0];group.remove(o);o.traverse(obj=>{if(obj.geometry)obj.geometry.dispose();if(obj.material){let ms=Array.isArray(obj.material)?obj.material:[obj.material];ms.forEach(m=>m.dispose());}});}}
+function tree(x,z,s,parent){let y=height(x,z);mesh(new THREE.CylinderGeometry(.08,.11,.7*s,6),material("#76553a"),parent,x,y+.35*s,z);mesh(new THREE.ConeGeometry(.47*s,1.25*s,7),material("#278558"),parent,x,y+1.12*s,z);mesh(new THREE.ConeGeometry(.35*s,.9*s,7),material("#399966"),parent,x,y+1.55*s,z);}
+function house(x,z,c,parent){let y=height(x,z);let g=new THREE.Group();g.position.set(x,y,z);parent.add(g);mesh(new THREE.BoxGeometry(1.1,.95,1),material(c),g,0,.48,0);let roof=mesh(new THREE.ConeGeometry(.94,.8,4),material("#ae594d"),g,0,1.33,0);roof.rotation.y=Math.PI/4;mesh(new THREE.BoxGeometry(.25,.46,.045),material("#86684e"),g,.23,.25,.525);mesh(new THREE.BoxGeometry(.28,.25,.045),material("#8ac7d9"),g,-.25,.65,.525);return g;}
+function createBase(){
+scene=new THREE.Scene();scene.background=new THREE.Color("#b9dfee");scene.fog=new THREE.Fog("#b9dfee",24,48);
+camera=new THREE.PerspectiveCamera(48,1,.1,100);camera.position.set(13,14,17);
+renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"default"});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(320,300);renderer.outputColorSpace=THREE.SRGBColorSpace;$("#canvasHost").appendChild(renderer.domElement);renderer.domElement.style.touchAction="none";
+controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=10;controls.maxDistance=37;controls.maxPolarAngle=Math.PI/2.12;controls.target.set(0,.5,0);controls.update();
+scene.add(new THREE.HemisphereLight("#ffffff","#8d9e7d",2));let sun=new THREE.DirectionalLight("#fff4dc",2.1);sun.position.set(-6,16,9);scene.add(sun);
+let g=new THREE.PlaneGeometry(20,15,75,55);g.rotateX(-Math.PI/2);let p=g.attributes.position,colors=[];let c=new THREE.Color();
+for(let i=0;i<p.count;i++){let x=p.getX(i),z=p.getZ(i),h=height(x,z);p.setY(i,h);c.set(h>2.1?"#87988a":h>1.3?"#83a275":h>.65?"#83ad76":"#8bbd7d");colors.push(c.r,c.g,c.b);}
+g.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));g.computeVertexNormals();terrain=mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}),scene);
+mesh(new THREE.BoxGeometry(20,.9,15),material("#927654"),scene,0,-.47,0);
+riverGroup=new THREE.Group();scene.add(riverGroup);
+let pts=[];for(let i=0;i<=42;i++){let z=-7.4+i*14.8/42,x=riverX(z);pts.push(new THREE.Vector3(x,height(x,z)+.09,z));}
+mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),95,.35,6,false),material("#4daed1",{metalness:.04,roughness:.38}),riverGroup);
+treesGroup=new THREE.Group();scene.add(treesGroup);
+housesGroup=new THREE.Group();scene.add(housesGroup);
+house(4.4,1.5,"#edcda6",housesGroup);house(6.3,2.1,"#e3bb9b",housesGroup);house(5.1,-.4,"#f0d9b4",housesGroup);
+mesh(new THREE.CylinderGeometry(.65,1.5,2.35,11),material("#817873"),scene,-5,height(-5,-1)+1.2,-1);
+mesh(new THREE.CylinderGeometry(.47,.47,.08,11),material("#473b38"),scene,-5,height(-5,-1)+2.4,-1);
+rockGroup=new THREE.Group();scene.add(rockGroup);let rock=mesh(new THREE.DodecahedronGeometry(.9,0),material("#a0a7a7"),rockGroup,-2.9,height(-2.9,-4.7)+.65,-4.7);rock.scale.set(1.1,.85,1);
+weatherGroup=new THREE.Group();scene.add(weatherGroup);lavaGroup=new THREE.Group();scene.add(lavaGroup);sedimentGroup=new THREE.Group();scene.add(sedimentGroup);cloudGroup=new THREE.Group();scene.add(cloudGroup);
+}
+function line(points,color,parent){let g=new THREE.BufferGeometry().setFromPoints(points);let o=new THREE.Line(g,new THREE.LineBasicMaterial({color}));parent.add(o);return o;}
+function refreshScene(){
+const v=states[current].values,p=experiments[current].calc(v);
+disposeGroup(treesGroup);disposeGroup(weatherGroup);disposeGroup(lavaGroup);disposeGroup(sedimentGroup);
+const vegetation=current===1?v.plants:65;
+for(let i=0;i<44;i++){if(i/44>vegetation/100)continue;let x=-9+(i*7.317%18),z=-6.5+(i*4.921%13);if(Math.abs(x-riverX(z))<1.25||x>3&&x<8&&z>-2&&z<4||x>-6.5&&x<-3.7&&z>-2.7&&z<.6)continue;tree(x,z,.65+(i%4)*.13,treesGroup);}
+if(current===0){
+let n=Math.max(1,Math.round(p/13));for(let i=0;i<n;i++){let x=-3.4+(i%3)*.21,z=-4.7+.76,y=height(-2.9,-4.7)+.25+i*.12;line([new THREE.Vector3(x,y,z),new THREE.Vector3(x+.11,y-.15,z+.06),new THREE.Vector3(x+.02,y-.29,z+.07)],"#414a4b",weatherGroup);}
+}
+if(current===1){
+for(let i=0;i<Math.round(v.rain*.75);i++){let x=-9+(i*3.733%18),z=-6.5+(i*2.871%13),y=2.6+(i%6)*.45;line([new THREE.Vector3(x,y,z),new THREE.Vector3(x-.15,y-.43,z)],"#6eb9df",weatherGroup);}
+if(p>35)for(let i=0;i<Math.round(p/6);i++){let x=-3.8+(i*.36),z=1+(i%4)*.34;mesh(new THREE.SphereGeometry(.11,5,4),material("#b49369"),weatherGroup,x,height(x,z)+.11,z);}
+}
+if(current===2){
+let count=Math.max(2,Math.round(p/5));for(let i=0;i<count;i++){let z=3.7+(i%7)*.34,x=riverX(z)+.45+(i%3)*.17;mesh(new THREE.SphereGeometry(.12+(i%3)*.045,6,4),material("#dec28c"),sedimentGroup,x,height(x,z)+.12,z);}
+}
+if(current===3){
+housesGroup.children.forEach((h,i)=>{h.rotation.z=p>55?(i%2?-.05:.05):0;});
+}else housesGroup.children.forEach(h=>h.rotation.z=0);
+if(current===4){
+let length=1+p/16;let points=[];for(let i=0;i<=25;i++){let t=i/25,x=-4.62+t*length*.58,z=-1+t*length*.42;let y=(1-t)*(height(-5,-1)+2.45)+t*(height(x,z)+.16);points.push(new THREE.Vector3(x,y,z));}
+mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),40,.16+p/500,7,false),material("#f46727",{emissive:"#aa2200",emissiveIntensity:.3}),lavaGroup);
+}
+$("#meter").textContent=experiments[current].unit+": "+ar(p)+"٪";
+}
+function stats(){
+let n=states.filter(s=>s.done).length;
+$("#progressLabel").textContent=ar(n)+" من ٥";$("#progressFill").style.width=(n*20)+"%";
+let safe=[1,3,4].every(i=>states[i].done&&states[i].result<40);
+$("#mission").textContent=n===5&&safe?"🏆 أحسنتِ! أكملتِ التجارب وقلّلتِ الأخطار في المحاكاة.":n===5?"أكملتِ التجارب! جرّبي تقليل أخطار التعرية والزلازل والحمم إلى أقل من ٤٠٪.":"أكملي التجارب الخمس، وقلّلي أخطار التعرية والزلازل والحمم إلى أقل من ٤٠٪.";
+document.querySelectorAll("#tabs button").forEach((b,i)=>{b.querySelector("small").textContent=states[i].done?" ✓":"";});
+}
+function choose(i){
+current=i;choice=null;let e=experiments[i],s=states[i];
+document.querySelectorAll("#tabs button").forEach((b,j)=>b.classList.toggle("active",i===j));
+$("#heading").textContent=e.heading;$("#intro").textContent=e.intro;$("#lesson").textContent=e.lesson;
+$("#sliders").innerHTML=e.keys.map(([k,label])=>'<div class="field"><label for="f-'+k+'"><span>'+label+'</span><output id="o-'+k+'">'+ar(s.values[k])+'٪</output></label><input id="f-'+k+'" data-key="'+k+'" type="range" min="0" max="100" step="5" value="'+s.values[k]+'"></div>').join("");
+document.querySelectorAll("#sliders input").forEach(input=>input.addEventListener("input",()=>{s.values[input.dataset.key]=Number(input.value);$("#o-"+input.dataset.key).textContent=ar(input.value)+"٪";refreshScene();}));
+document.querySelectorAll("#choices button").forEach(b=>b.classList.remove("sel"));
+$("#result").textContent=s.done?"النتيجة السابقة: "+ar(s.result)+"٪. يمكنكِ تغيير العوامل وإعادة التجربة.":"غيّري العوامل، ثم اختاري توقّعك وشغّلي التجربة.";
+refreshScene();
+}
+function run(){
+let e=experiments[current],s=states[current],p=e.calc(s.values),actual=p>54?"up":p<46?"down":"same";
+let correct=choice===actual;s.done=true;s.result=p;if(correct)s.point=true;
+if(current===3)animateQuakeUntil=performance.now()+1400;
+refreshScene();stats();
+$("#result").textContent=e.unit+": "+ar(p)+"٪. "+(choice===null?"اختاري توقّعًا في التجربة القادمة.":correct?"🎉 توقّع صحيح!":"🔍 راجعي أثر العوامل وحاولي مرة أخرى.")+" "+e.lesson;
+}
+$("#tabs").innerHTML=experiments.map((e,i)=>'<button type="button" data-i="'+i+'"><span class="emoji">'+e.icon+'</span>'+e.name+'<small></small></button>').join("");
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>choose(Number(b.dataset.i))));
+document.querySelectorAll("#choices button").forEach(b=>b.addEventListener("click",()=>{choice=b.dataset.choice;document.querySelectorAll("#choices button").forEach(x=>x.classList.toggle("sel",x===b));}));
+$("#run").addEventListener("click",run);
+$("#reset").addEventListener("click",()=>{experiments[current].keys.forEach(([k])=>states[current].values[k]=50);choose(current);});
+function cameraReset(){camera.position.set(13,14,17);controls.target.set(0,.5,0);controls.update();}
+$("#left").addEventListener("click",()=>{camera.position.applyAxisAngle(new THREE.Vector3(0,1,0),-.3);controls.update();});
+$("#right").addEventListener("click",()=>{camera.position.applyAxisAngle(new THREE.Vector3(0,1,0),.3);controls.update();});
+$("#in").addEventListener("click",()=>{camera.position.multiplyScalar(.85);controls.update();});
+$("#out").addEventListener("click",()=>{camera.position.multiplyScalar(1.15);controls.update();});
+$("#home").addEventListener("click",cameraReset);
+try{
+createBase();choose(1);stats();
+function resize(){let el=$("#sceneWrap"),w=el.clientWidth,h=el.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+window.addEventListener("resize",resize);resize();
+function loop(time){requestAnimationFrame(loop);if(current===3&&time<animateQuakeUntil){housesGroup.position.x=Math.sin(time*.075)*states[3].values.quake*.002;}else housesGroup.position.x=0;
+if(current===1)weatherGroup.position.y=Math.sin(time*.003)*.2;else weatherGroup.position.y=0;
+controls.update();renderer.render(scene,camera);}
+requestAnimationFrame(loop);
+}catch(err){console.error(err);$("#fallback").style.display="block";$("#sceneWrap").style.display="none";}
+</script>
+</body></html>
