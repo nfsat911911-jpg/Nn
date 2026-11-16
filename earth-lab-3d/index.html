@@ -14,6 +14,11 @@ nav button{border:1px solid #d4e4e8;background:white;color:#26495c;border-radius
 nav button .emoji{display:block;font-size:21px}nav button.active{background:#d7f0ef;border-color:#128c98;color:#075d70;font-weight:800}
 #sceneWrap{position:relative;height:min(53vh,490px);min-height:265px;background:#c4e3f0;overflow:hidden}
 #sceneWrap canvas{display:block;width:100%;height:100%;touch-action:none}
+#liveStatus{position:absolute;right:9px;bottom:10px;background:#084d65ed;color:#fff;border-radius:9px;padding:7px 10px;font-size:11px;max-width:55%;pointer-events:none;display:none}
+#liveStatus.on{display:block}
+#liveStatus .bar{height:5px;background:#ffffff55;border-radius:8px;margin-top:5px;overflow:hidden}
+#liveStatus .bar i{display:block;height:100%;width:0;background:#66ead4}
+#run:disabled{opacity:.6;cursor:wait}
 .overlay{position:absolute;top:9px;right:9px;pointer-events:none;background:#fffffff0;padding:7px 9px;border-radius:9px;font-size:11px;line-height:1.5;color:#25566a}
 #meter{position:absolute;top:9px;left:9px;pointer-events:none;background:#fffef3ed;padding:7px 9px;border-radius:9px;font-size:11px;color:#594c35}
 .camera{position:absolute;bottom:10px;left:10px;display:flex;gap:5px;direction:ltr}
@@ -41,7 +46,7 @@ footer{padding:10px 14px;color:#647b86;font-size:10px;line-height:1.7}
 <header><h1>🌍 مختبر الأرض الحيّة 3D</h1><p>علوم الصف الخامس | استكشفي العمليات المؤثرة في سطح الأرض</p></header>
 <nav id="tabs" aria-label="اختيار التجربة"></nav>
 <div id="sceneWrap"><div id="canvasHost"></div><div class="overlay">👆 اسحبي لتدوير الأرض<br>🤏 بإصبعين للتقريب</div><div id="meter">مؤشر التأثير: ٥٠٪</div>
-<div class="camera"><button id="left" aria-label="تدوير يسارًا">↶</button><button id="right" aria-label="تدوير يمينًا">↷</button><button id="out" aria-label="إبعاد">−</button><button id="in" aria-label="تقريب">+</button><button id="home" aria-label="المنظر الأصلي">⌂</button></div></div>
+<div id="liveStatus" role="status"><span id="liveText">تجربة جارية</span><div class="bar"><i id="liveFill"></i></div></div><div class="camera"><button id="left" aria-label="تدوير يسارًا">↶</button><button id="right" aria-label="تدوير يمينًا">↷</button><button id="out" aria-label="إبعاد">−</button><button id="in" aria-label="تقريب">+</button><button id="home" aria-label="المنظر الأصلي">⌂</button></div></div>
 <div id="fallback">تعذّر تشغيل المشهد الثلاثي الأبعاد. افتحي الرابط في Safari أو Chrome مع اتصال بالإنترنت.</div>
 <div class="info" id="intro"></div>
 <section class="controls"><h2 id="heading"></h2><div class="sliders" id="sliders"></div><div class="question">🔮 ما توقّعك مقارنةً بالمستوى المتوسط؟</div>
@@ -66,6 +71,7 @@ const experiments=[
 ];
 const states=experiments.map(e=>({values:Object.fromEntries(e.keys.map(k=>[k[0],50])),done:false,point:false,result:50}));
 let current=1,choice=null,animateQuakeUntil=0,scene,camera,renderer,controls,terrain,treesGroup,housesGroup,riverGroup,weatherGroup,lavaGroup,sedimentGroup,rockGroup,cloudGroup;
+let effectGroup=null,effectObjects=[],effectStart=0,effectDuration=10500,effectMode=-1,originalRock=null,lavaIndexCount=0;
 function gaussian(x,z,cx,cz,sx,sz){return Math.exp(-((x-cx)**2/sx+(z-cz)**2/sz));}
 function riverX(z){return -.7+Math.sin(z*.6)*.85;}
 function height(x,z){return .15+2.75*gaussian(x,z,-5,-1,13,14)+1.35*gaussian(x,z,-2,4,20,11)+1.1*gaussian(x,z,5,-4,14,9)-.26*gaussian(x,z,riverX(z),z,1.2,100);}
@@ -92,7 +98,7 @@ housesGroup=new THREE.Group();scene.add(housesGroup);
 house(4.4,1.5,"#edcda6",housesGroup);house(6.3,2.1,"#e3bb9b",housesGroup);house(5.1,-.4,"#f0d9b4",housesGroup);
 mesh(new THREE.CylinderGeometry(.65,1.5,2.35,11),material("#817873"),scene,-5,height(-5,-1)+1.2,-1);
 mesh(new THREE.CylinderGeometry(.47,.47,.08,11),material("#473b38"),scene,-5,height(-5,-1)+2.4,-1);
-rockGroup=new THREE.Group();scene.add(rockGroup);let rock=mesh(new THREE.DodecahedronGeometry(.9,0),material("#a0a7a7"),rockGroup,-2.9,height(-2.9,-4.7)+.65,-4.7);rock.scale.set(1.1,.85,1);
+rockGroup=new THREE.Group();scene.add(rockGroup);let rock=mesh(new THREE.DodecahedronGeometry(.9,0),material("#a0a7a7"),rockGroup,-2.9,height(-2.9,-4.7)+.65,-4.7);rock.scale.set(1.1,.85,1);originalRock=rock;effectGroup=new THREE.Group();scene.add(effectGroup);
 weatherGroup=new THREE.Group();scene.add(weatherGroup);lavaGroup=new THREE.Group();scene.add(lavaGroup);sedimentGroup=new THREE.Group();scene.add(sedimentGroup);cloudGroup=new THREE.Group();scene.add(cloudGroup);
 }
 function line(points,color,parent){let g=new THREE.BufferGeometry().setFromPoints(points);let o=new THREE.Line(g,new THREE.LineBasicMaterial({color}));parent.add(o);return o;}
@@ -116,10 +122,128 @@ housesGroup.children.forEach((h,i)=>{h.rotation.z=p>55?(i%2?-.05:.05):0;});
 }else housesGroup.children.forEach(h=>h.rotation.z=0);
 if(current===4){
 let length=1+p/16;let points=[];for(let i=0;i<=25;i++){let t=i/25,x=-4.62+t*length*.58,z=-1+t*length*.42;let y=(1-t)*(height(-5,-1)+2.45)+t*(height(x,z)+.16);points.push(new THREE.Vector3(x,y,z));}
-mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),40,.16+p/500,7,false),material("#f46727",{emissive:"#aa2200",emissiveIntensity:.3}),lavaGroup);
+let lava=mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),50,.16+p/500,8,false),material("#f46727",{emissive:"#aa2200",emissiveIntensity:.55}),lavaGroup);
+lavaIndexCount=lava.geometry.index.count;lava.geometry.setDrawRange(0,0);
 }
 $("#meter").textContent=experiments[current].unit+": "+ar(p)+"٪";
 }
+
+/* Live animated educational simulations: every experiment moves real 3D objects. */
+function stopEffect(){
+ effectStart=0;effectMode=-1;effectObjects=[];if(effectGroup)disposeGroup(effectGroup);
+ $("#liveStatus").classList.remove("on");$("#run").disabled=false;$("#run").textContent="▶ تشغيل التجربة";
+ if(originalRock)originalRock.scale.set(1.1,.85,1);
+}
+function focusExperiment(i){
+ const focus=[[-3,1,-4.5],[-1,.5,0],[0,.3,4.1],[5,1,1],[-4.6,1.4,-1]][i];
+ controls.target.set(...focus);
+ camera.position.set(focus[0]+8.5,focus[1]+9.5,focus[2]+11);
+ controls.update();
+}
+function particle(kind,x,y,z,r,color,extra={}){
+ let geo=kind==="rock"?new THREE.DodecahedronGeometry(r,0):new THREE.SphereGeometry(r,6,5);
+ let mat=material(color,extra);
+ let o=mesh(geo,mat,effectGroup,x,y,z);
+ return o;
+}
+function startEffect(){
+ stopEffect();
+ effectMode=current;effectStart=performance.now();effectObjects=[];
+ const v=states[current].values,score=experiments[current].calc(v);
+ focusExperiment(current);
+ const n=current===0?26:current===1?95:current===2?58:current===3?18:45;
+ for(let i=0;i<n;i++){
+  let x=0,y=0,z=0,r=.1,color="#e0bf8b",kind="rock";
+  if(current===0){x=-3.2+(i%5)*.14;y=height(-2.9,-4.7)+.5+(i%6)*.09;z=-4.7+(i%4)*.13;r=.09+(i%3)*.045;color=i%3===0?"#7b8587":"#a2a8a8";}
+  if(current===1){
+   if(i<58){x=-8.5+(i*3.17%17);z=-6.5+(i*4.29%13);y=3.1+(i%8)*.4;r=.025;color="#4baad9";kind="drop";}
+   else if(i<78){let zz=-6+(i-58)*.57;x=riverX(zz);z=zz;y=height(x,z)+.19;r=.11;color="#78d4f3";kind="drop";}
+   else{x=-5.7+(i-78)*.18;z=-1.8+(i%5)*.2;y=height(x,z)+.18;r=.11+(i%3)*.025;color="#ae845a";}
+  }
+  if(current===2){z=-6+(i%16)*.5;x=riverX(z)+(i%3)*.13;y=height(x,z)+.17;r=.075+(i%4)*.016;color=i%3===0?"#f4d9a0":"#d7b678";}
+  if(current===3){x=3.6+(i%6)*.52;z=.5+Math.floor(i/6)*1.25;y=height(x,z)+.05;r=.05+(i%3)*.03;color="#9a775b";}
+  if(current===4){x=-5;y=height(-5,-1)+2.45;z=-1;r=.1+(i%3)*.055;color=i%3===0?"#ffe66c":"#f65d1e";}
+  let o=particle(kind,x,y,z,r,color,current===4?{emissive:"#e83808",emissiveIntensity:.8}:{});
+  effectObjects.push({mesh:o,index:i,x,y,z,phase:((i*37)%101)/101,kind,seed:i});
+ }
+ if(current===4&&lavaGroup.children[0])lavaGroup.children[0].geometry.setDrawRange(0,0);
+ $("#liveStatus").classList.add("on");
+ $("#run").disabled=true;$("#run").textContent="⏳ التجربة تتحرك الآن";
+ const messages=["🪨 تتفتّت الصخور وتتساقط القطع","🌧️ المطر يجرف التربة والماء يجري","🏝️ الرواسب تتحرك ثم تستقر","🏘️ الأرض تهتز والمباني تتأثر","🌋 الحمم تتدفق على سفح البركان"];
+ $("#liveText").textContent=messages[current];
+}
+function animateEffect(time){
+ if(!effectStart)return;
+ let t=Math.min(1,(time-effectStart)/effectDuration);
+ $("#liveFill").style.width=Math.round(t*100)+"%";
+ const mode=effectMode,v=states[mode].values,score=experiments[mode].calc(v);
+ for(const a of effectObjects){
+  const o=a.mesh,i=a.index,delay=a.phase*.32,local=Math.max(0,Math.min(1,(t-delay)/(1-delay)));
+  if(mode===0){
+   let strength=.15+score/100;
+   o.position.set(a.x+(i%2?1:-1)*local*(.5+strength*.8),a.y-local*(.5+(i%4)*.18)+Math.sin(local*12+i)*.05,a.z+local*(.6+(i%3)*.2));
+   let ground=height(o.position.x,o.position.z)+.06;
+   o.position.y=Math.max(ground,o.position.y);
+   o.rotation.x=local*(i%3+2)*3;o.rotation.z=local*4;
+   o.visible=local>0.02;
+  }else if(mode===1){
+   if(i<58){
+    let speed=1.1+v.rain/65,cyc=((t*speed*3+a.phase)%1);
+    o.position.set(a.x,a.y-cyc*5,a.z);o.visible=v.rain>0&&cyc<.93;
+    o.scale.set(.55,2.6,.55);
+   }else if(i<78){
+    let progress=(a.phase+t*(.15+v.rain/100*.9))%1;
+    let z=-6.7+progress*13.4,x=riverX(z);
+    o.position.set(x,height(x,z)+.15,z);
+    o.visible=true;o.scale.set(1.3,.45,1.3);
+   }else{
+    let dist=local*(.8+score/35);
+    let x=a.x+dist*.5,z=a.z+dist*.5;
+    o.position.set(x,height(x,z)+.11,z);o.rotation.z=local*5;
+    o.visible=local>.02&&score>7;
+   }
+  }else if(mode===2){
+   let p=local*(.5+(100-v.speed)/80),z=Math.min(6.4,a.z+p*10);
+   let targetX=riverX(z)+.45+score/190;
+   let x=riverX(z)+(i%3)*.13+(targetX-riverX(z))*Math.pow(local,1.7);
+   o.position.set(x,height(x,z)+.12,z);
+   o.visible=local>.02;
+   o.scale.setScalar(local>.88?1.25:1);
+  }else if(mode===3){
+   let shaking=(.2+v.quake/80)*(1-t);
+   o.position.set(a.x+Math.sin(time*.065+i)*shaking*.22,a.y+Math.abs(Math.sin(time*.06+i))*shaking*.13,a.z);
+   o.visible=local>.05&&score>20;
+  }else if(mode===4){
+   let len=1+score/16;
+   let prog=(local*(.65+(i%7)*.04))%1;
+   let x=-4.62+prog*len*.58,z=-1+prog*len*.42;
+   let y=(1-prog)*(height(-5,-1)+2.45)+prog*(height(x,z)+.18);
+   o.position.set(x+Math.sin(i*7)*.12,y+.05,z+Math.cos(i*3)*.12);
+   o.visible=local>.01;
+   o.scale.setScalar(.8+Math.sin(time*.006+i)*.18);
+  }
+ }
+ if(mode===3){
+  housesGroup.position.x=Math.sin(time*.075)*(v.quake/100)*.22*(1-t*.35);
+  housesGroup.position.z=Math.cos(time*.085)*(v.quake/100)*.12*(1-t*.35);
+  housesGroup.rotation.z=Math.sin(time*.045)*(v.quake/100)*.025;
+ }
+ if(mode===4&&lavaGroup.children[0]){
+  const geo=lavaGroup.children[0].geometry;
+  geo.setDrawRange(0,Math.floor(lavaIndexCount*t/3)*3);
+ }
+ if(mode===0&&originalRock){
+  let shrink=Math.min(.35,(score/100)*.35)*t;
+  originalRock.scale.set(1.1-shrink,.85-shrink*.5,1-shrink);
+ }
+ if(t>=1){
+  effectStart=0;
+  $("#liveStatus").classList.remove("on");$("#run").disabled=false;$("#run").textContent="▶ إعادة تشغيل الحركة";
+  $("#result").textContent+=" ✔ اكتملت الحركة. يمكنكِ تدوير المشهد وإعادة التجربة بعوامل مختلفة.";
+  housesGroup.position.set(0,0,0);housesGroup.rotation.set(0,0,0);
+ }
+}
+
 function stats(){
 let n=states.filter(s=>s.done).length;
 $("#progressLabel").textContent=ar(n)+" من ٥";$("#progressFill").style.width=(n*20)+"%";
@@ -128,7 +252,7 @@ $("#mission").textContent=n===5&&safe?"🏆 أحسنتِ! أكملتِ التج�
 document.querySelectorAll("#tabs button").forEach((b,i)=>{b.querySelector("small").textContent=states[i].done?" ✓":"";});
 }
 function choose(i){
-current=i;choice=null;let e=experiments[i],s=states[i];
+stopEffect();current=i;choice=null;let e=experiments[i],s=states[i];
 document.querySelectorAll("#tabs button").forEach((b,j)=>b.classList.toggle("active",i===j));
 $("#heading").textContent=e.heading;$("#intro").textContent=e.intro;$("#lesson").textContent=e.lesson;
 $("#sliders").innerHTML=e.keys.map(([k,label])=>'<div class="field"><label for="f-'+k+'"><span>'+label+'</span><output id="o-'+k+'">'+ar(s.values[k])+'٪</output></label><input id="f-'+k+'" data-key="'+k+'" type="range" min="0" max="100" step="5" value="'+s.values[k]+'"></div>').join("");
@@ -140,8 +264,7 @@ refreshScene();
 function run(){
 let e=experiments[current],s=states[current],p=e.calc(s.values),actual=p>54?"up":p<46?"down":"same";
 let correct=choice===actual;s.done=true;s.result=p;if(correct)s.point=true;
-if(current===3)animateQuakeUntil=performance.now()+1400;
-refreshScene();stats();
+refreshScene();stats();startEffect();
 $("#result").textContent=e.unit+": "+ar(p)+"٪. "+(choice===null?"اختاري توقّعًا في التجربة القادمة.":correct?"🎉 توقّع صحيح!":"🔍 راجعي أثر العوامل وحاولي مرة أخرى.")+" "+e.lesson;
 }
 $("#tabs").innerHTML=experiments.map((e,i)=>'<button type="button" data-i="'+i+'"><span class="emoji">'+e.icon+'</span>'+e.name+'<small></small></button>').join("");
@@ -159,9 +282,7 @@ try{
 createBase();choose(1);stats();
 function resize(){let el=$("#sceneWrap"),w=el.clientWidth,h=el.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}
 window.addEventListener("resize",resize);resize();
-function loop(time){requestAnimationFrame(loop);if(current===3&&time<animateQuakeUntil){housesGroup.position.x=Math.sin(time*.075)*states[3].values.quake*.002;}else housesGroup.position.x=0;
-if(current===1)weatherGroup.position.y=Math.sin(time*.003)*.2;else weatherGroup.position.y=0;
-controls.update();renderer.render(scene,camera);}
+function loop(time){requestAnimationFrame(loop);animateEffect(time);controls.update();renderer.render(scene,camera);}
 requestAnimationFrame(loop);
 }catch(err){console.error(err);$("#fallback").style.display="block";$("#sceneWrap").style.display="none";}
 </script>
