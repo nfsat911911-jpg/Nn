@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101d39">
+<meta name="description" content="لعبة كيمياء الخلية التفاعلية لطالبات ثاني ثانوي، 10 تحديات تحليل وتركيب وتفكير عليا وشهادة إتمام. إعداد الأستاذة غزوى البقمي.">
+<title>رحلة الجزيئات | كيمياء الخلية - غزوى البقمي</title>
+<style>
+:root{--navy:#0c1630;--deep:#122347;--ink:#16264b;--purple:#7866ff;--pink:#ee77cf;--mint:#31c6b6;--gold:#ffc670;--paper:#f7faff;--text:#233457;--muted:#6a7897;--shadow:0 22px 60px rgba(8,19,48,.25)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#0b1735;font-family:Tahoma,"Arial",sans-serif;min-height:100dvh;color:white;overflow-x:hidden;line-height:1.75}
+button,input{font:inherit}
+button{touch-action:manipulation;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #ffe49c;outline-offset:4px}
+#bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 12% 20%,#5e3b964d,transparent 35%),radial-gradient(circle at 88% 12%,#00bea344,transparent 36%),radial-gradient(circle at 58% 90%,#b542aa39,transparent 34%),linear-gradient(135deg,#0b1732,#19244f 54%,#15234d)}
+#bg:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#ffffff3b 1px,transparent 1px);background-size:31px 31px;opacity:.38}
+.orb{position:fixed;width:180px;height:180px;border:2px solid #91f3e43b;border-radius:50%;z-index:-1;filter:drop-shadow(0 0 24px #60d3c02b);animation:drift 12s ease-in-out infinite;pointer-events:none}
+.orb:before,.orb:after{content:"";position:absolute;border:2px solid #ffffff75;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff,#74e1d6 48%,#4162bd);box-shadow:0 0 18px #73e2d3; width:24px;height:24px;top:26px;left:-6px}
+.orb:after{top:auto;left:auto;right:7px;bottom:18px;width:17px;height:17px;background:radial-gradient(circle at 30% 25%,#fff,#f48ad0 55%,#9058a9)}
+.orb.one{top:5%;left:4%;transform:rotate(26deg)}.orb.two{width:112px;height:112px;right:2%;bottom:4%;animation-delay:-4s}
+@keyframes drift{0%,100%{translate:0 0}50%{translate:0 -20px}}
+.page{width:min(1020px,calc(100% - 28px));margin:26px auto 35px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:4px 9px 18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:bold;font-size:16px}
+.brand-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#40d9bf,#766dfb);box-shadow:0 8px 28px #54cde25e;font-size:25px}
+.topchip{color:#bcd6ee;border:1px solid #a2b9fa40;background:#ffffff10;padding:7px 14px;border-radius:50px;font-size:13px}
+.glass{background:linear-gradient(135deg,#ffffff24,#ffffff0d);border:1px solid #ffffff3c;box-shadow:var(--shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:28px;overflow:hidden}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:10px;padding:34px 34px 28px;min-height:480px;align-items:center}
+.kicker{color:#84eadb;font-size:13px;font-weight:bold;letter-spacing:.5px}
+h1{font-size:clamp(32px,5.5vw,62px);line-height:1.25;margin:8px 0 12px;color:#fff}
+.grad{color:#8ee7e2}
+.lead{font-size:17px;color:#d6e3fa;margin:6px 0 22px;max-width:480px}
+.features{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.features span{font-size:13px;border:1px solid #ffffff2d;border-radius:24px;background:#ffffff14;color:#e5edff;padding:7px 12px}
+.formtitle{font-weight:bold;font-size:15px;display:block;margin:18px 0 8px}
+.namefield{width:100%;min-height:52px;border:1px solid #bce9ff8a;background:#f6faff;color:#14244f;border-radius:14px;padding:12px 16px;font-size:17px;outline:none}
+.namefield::placeholder{color:#7784a0}
+.error{font-size:14px;color:#ffceda;min-height:25px;margin:4px 0}
+.primary{border:0;color:#101d40;border-radius:15px;background:linear-gradient(110deg,#75e6d0,#94d1ff 53%,#bba3ff);font-weight:800;padding:14px 22px;min-height:52px;box-shadow:0 9px 25px #4ac8ce36;transition:transform .17s,filter .17s}
+.primary:hover{filter:brightness(1.05);transform:translateY(-2px)}
+.primary:disabled{opacity:.55;cursor:not-allowed}
+.visual{position:relative;display:grid;place-items:center;min-height:340px}
+.cell-art{width:min(420px,100%);height:auto;filter:drop-shadow(0 20px 30px #38c3d64c);animation:floatcell 7s ease-in-out infinite}
+@keyframes floatcell{50%{transform:translateY(-13px) rotate(2deg)}}
+.visual-label{position:absolute;left:4%;bottom:10px;padding:8px 14px;border:1px solid #ffffff50;background:#182e62c9;border-radius:15px;box-shadow:0 8px 18px #10193577;font-size:13px}
+.hint{font-size:13px;color:#d2e5f7;opacity:.88}
+.footer{text-align:center;padding:22px 10px;color:#b5c7ea;font-size:13px}
+.game{padding:25px clamp(15px,4vw,48px) 35px}
+.gamehead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.step{font-size:13px;color:#a1ebdb;letter-spacing:1px;font-weight:bold}
+.gamehead h2{font-size:clamp(23px,4vw,34px);margin:4px 0;color:white}
+.scorechip{border:1px solid #a9dafa50;border-radius:16px;background:#ffffff14;padding:10px 14px;color:#e9f3ff;font-size:14px}
+.track{height:10px;background:#ffffff2a;overflow:hidden;border-radius:20px;margin:19px 0 26px}
+.fill{height:100%;width:0%;background:linear-gradient(90deg,#6de5c8,#92b8ff,#f4a0d9);border-radius:20px;transition:width .5s}
+.questionCard{background:#f8fbff;color:var(--text);border-radius:23px;padding:clamp(18px,4vw,30px);box-shadow:0 14px 35px #09132b5c}
+.qtag{display:inline-block;background:#e9ebff;border-radius:25px;color:#5949ad;font-size:13px;font-weight:bold;padding:4px 14px}
+.qtext{font-size:clamp(19px,3vw,23px);line-height:1.85;font-weight:bold;margin:17px 0 18px;color:#15264d}
+.choices{display:grid;gap:12px}
+.choice{display:flex;align-items:center;text-align:right;gap:13px;width:100%;min-height:65px;padding:12px 15px;background:white;border:2px solid #e0e7f4;border-radius:15px;color:#182a53;font-size:16px;line-height:1.7;font-weight:600;transition:border .17s,transform .17s}
+.choice:not(:disabled):hover{border-color:#7e8efa;transform:translateX(-2px);background:#f6f7ff}
+.choice .letter{flex:0 0 34px;height:34px;display:grid;place-items:center;background:#eef1ff;border-radius:11px;color:#584cb3}
+.choice.correct{border-color:#2da989;background:#e2f9f0;color:#07543e}
+.choice.correct .letter{background:#2baf90;color:#fff}
+.choice.wrong{border-color:#e8708a;background:#ffebf0;color:#8e274b}
+.choice.wrong .letter{background:#dd6681;color:white}
+.choice:disabled{cursor:default}
+.feedback{margin-top:20px;border-radius:15px;padding:16px 18px;display:none;font-size:15px;line-height:1.8}
+.feedback.show{display:block}
+.feedback.good{color:#075944;background:#ddf9ed;border:1px solid #8cddc0}
+.feedback.bad{color:#823052;background:#fff0f2;border:1px solid #efbac9}
+.feedback strong{font-size:18px}
+.feedback small{display:block;font-size:15px;line-height:1.75;margin-top:6px}
+.nextrow{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.nextrow .primary{min-width:175px}
+.nextrow .helper{color:#687998;font-size:13px}
+.hidden{display:none!important}
+.result{padding:28px 18px 38px}
+.resultintro{text-align:center}
+.resultintro h2{font-size:clamp(25px,4vw,38px);margin:8px}
+.resultintro p{color:#d1e2f7}
+.statline{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0 25px}
+.statline span{background:#ffffff16;border:1px solid #ffffff29;border-radius:40px;padding:7px 16px}
+.certificate{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 0%,#f8f1ff,transparent 48%),linear-gradient(135deg,#ffffff,#f7faff 60%,#f9f0ff);color:#24385c;border:12px solid #eddfac;border-radius:20px;min-height:450px;padding:35px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:inset 0 0 0 2px #d6bb77,0 15px 35px #0002}
+.certificate:before,.certificate:after{content:"✦";position:absolute;color:#d9bc72;font-size:58px;top:17px;right:28px;opacity:.6}
+.certificate:after{right:auto;left:28px;bottom:15px;top:auto}
+.certificate .symbol{font-size:45px;line-height:1}
+.certificate h3{font-size:clamp(28px,5vw,44px);margin:5px 0;color:#5b4b91}
+.certificate .certlabel{font-size:15px;color:#766798;letter-spacing:.5px}
+.certificate .student{display:block;font-size:clamp(25px,5.5vw,39px);color:#233767;font-weight:bold;max-width:100%;overflow-wrap:anywhere;margin:10px 0}
+.certificate .certtext{max-width:640px;font-size:17px;line-height:2;color:#55627b}
+.certificate .resultscore{display:inline-block;margin:12px 0;border-radius:12px;padding:5px 20px;background:#ebeafa;color:#514d91;font-weight:bold;font-size:20px}
+.certificate .certsign{width:min(92%,680px);display:flex;justify-content:space-between;gap:18px;border-top:1px solid #d9cba9;margin-top:19px;padding-top:15px;text-align:center;color:#64718a;font-size:14px}
+.buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:22px auto 0}
+.secondary{border:1px solid #b8cbf4a0;color:#f1f5ff;background:#ffffff19;border-radius:15px;padding:13px 18px;min-height:52px;font-weight:bold}
+.secondary:hover{background:#ffffff30}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:700px){.page{width:min(100% - 20px,600px);margin:12px auto}.topbar{padding:7px 6px 13px}.topchip{font-size:11px}.hero{grid-template-columns:1fr;padding:22px 19px 25px}.hero .visual{order:-1;min-height:210px}.cell-art{width:min(270px,78%)}.visual-label{left:7%;bottom:2px}.features span{font-size:11px}.lead{font-size:15px}.glass{border-radius:22px}.game{padding:20px 12px 24px}.questionCard{border-radius:18px}.choice{font-size:15px}.orb.one{opacity:.35}.certificate{min-height:410px;padding:28px 12px;border-width:8px}.certificate .certtext{font-size:15px}.certificate .certsign{font-size:12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+@media print{@page{size:A4 landscape;margin:7mm}html,body{height:auto!important;background:white!important;margin:0!important;overflow:visible!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.topbar,#welcome,#quiz,#bg,.orb,.footer,.resultintro,.statline,.buttons{display:none!important}.page{width:100%;max-width:none;margin:0}.glass{box-shadow:none;border:none;background:white;backdrop-filter:none;overflow:visible}.result{padding:0}.certificate{border:12px double #bda062;box-shadow:none;border-radius:0;min-height:185mm;height:185mm;max-height:185mm;page-break-inside:avoid;padding:13mm 18mm}.certificate h3{font-size:40px}.certificate .student{font-size:38px}}
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div><div class="orb one" aria-hidden="true"></div><div class="orb two" aria-hidden="true"></div>
+<main class="page">
+ <header class="topbar">
+  <div class="brand"><div class="brand-icon" aria-hidden="true">🧬</div><div>مختبر الأحياء التفاعلي<br><small style="font-size:12px;font-weight:normal;color:#a8d4ea">مهمة الجزيئات الحيوية</small></div></div>
+  <div class="topchip">أحياء 2-1 | ثاني ثانوي</div>
+ </header>
+ <section id="welcome" class="glass hero" aria-labelledby="welcomeTitle">
+  <div>
+   <div class="kicker">تحدي علمي • تحليل | تركيب | تفكير ناقد</div>
+   <h1 id="welcomeTitle">رحلة في <span class="grad">كيمياء الخلية</span></h1>
+   <p class="lead">تخيّلي أنكِ باحثة داخل خلية حية. أمامكِ عشر مهمات لفهم الجزيئات الحيوية واتخاذ قرارات علمية دقيقة!</p>
+   <div class="features"><span>✦ ١٠ تحديات</span><span>✦ تفسير فوري للإجابات</span><span>✦ شهادة باسمكِ</span></div>
+   <label class="formtitle" for="studentName">اسم الطالبة</label>
+   <input id="studentName" class="namefield" maxlength="60" type="text" autocomplete="name" placeholder="اكتبي اسمكِ الثلاثي" aria-describedby="nameError">
+   <div id="nameError" class="error" role="alert"></div>
+   <button class="primary" id="startBtn" type="button">ابدئي رحلة الجزيئات ✦</button>
+   <div class="hint">لا تحتاجين إلى تسجيل دخول، وتعمل اللعبة دون موسيقى.</div>
+  </div>
+  <div class="visual" aria-hidden="true">
+   <svg class="cell-art" viewBox="0 0 430 410" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="cyto" cx="34%" cy="25%"><stop offset="0%" stop-color="#c2eaff"/><stop offset="50%" stop-color="#52b9d4"/><stop offset="90%" stop-color="#4753a5"/><stop offset="100%" stop-color="#2c2574"/></radialGradient><radialGradient id="nu"><stop stop-color="#fff4fa"/><stop offset="65%" stop-color="#f395d6"/><stop offset="100%" stop-color="#aa54b4"/></radialGradient><linearGradient id="mit" x1="0" x2="1"><stop stop-color="#ffa8a8"/><stop offset="1" stop-color="#d061bb"/></linearGradient></defs>
+    <ellipse cx="210" cy="207" rx="174" ry="160" fill="#111c4c" opacity=".4"/>
+    <path d="M216 42C306 35 390 99 391 194C394 293 327 371 226 371C116 375 39 302 36 209C33 112 107 43 216 42Z" fill="url(#cyto)" stroke="#a5f5ee" stroke-width="7"/>
+    <path d="M216 55C301 49 376 108 379 195C382 281 318 356 226 358C126 360 53 296 49 209C48 123 115 58 216 55Z" fill="none" stroke="#eaffff" stroke-opacity=".45" stroke-dasharray="6 15" stroke-width="3"/>
+    <path d="M125 176C130 110 206 95 249 143C293 192 259 276 202 285C155 292 117 244 125 176Z" fill="#9c71d1" stroke="#edb2f2" stroke-width="6" opacity=".9"/>
+    <circle cx="195" cy="194" r="53" fill="url(#nu)" stroke="#ffe3fc" stroke-width="5"/>
+    <circle cx="183" cy="183" r="19" fill="#ba5da8"/>
+    <path d="M169 227Q192 192 218 229M174 162Q193 144 217 174" fill="none" stroke="#7f4da8" stroke-width="7" stroke-linecap="round"/>
+    <g transform="translate(284 134) rotate(-27)"><rect x="-53" y="-28" width="106" height="56" rx="28" fill="url(#mit)" stroke="#ffdee9" stroke-width="4"/><path d="M-38 0Q-21 -25 -7 0T24 0T43 0" stroke="#fce8ff" stroke-width="5" fill="none"/></g>
+    <g transform="translate(291 290) rotate(24)"><rect x="-50" y="-26" width="100" height="52" rx="26" fill="#efaf75" stroke="#fff2bc" stroke-width="4"/><path d="M-34 0Q-17 -22 -4 0T22 0T39 0" stroke="#ffe0ba" stroke-width="5" fill="none"/></g>
+    <g fill="#d4fff5"><circle cx="87" cy="202" r="7"/><circle cx="107" cy="267" r="5"/><circle cx="296" cy="217" r="5"/><circle cx="262" cy="91" r="6"/><circle cx="337" cy="244" r="6"/><circle cx="147" cy="109" r="5"/></g>
+    <path d="M86 130Q118 95 141 116M89 299Q134 314 165 299M276 336Q316 315 344 317" fill="none" stroke="#c1f4f7" stroke-width="6" stroke-linecap="round" opacity=".5"/>
+    <g stroke="#ffb9db" stroke-width="6" fill="#f9dcff"><path d="M314 75L346 43L378 72" fill="none"/><circle cx="314" cy="75" r="10"/><circle cx="346" cy="43" r="12"/><circle cx="378" cy="72" r="10"/></g>
+    <g stroke="#acf8ee" stroke-width="6" fill="#d4fcef"><path d="M42 268L21 298L60 325" fill="none"/><circle cx="42" cy="268" r="10"/><circle cx="21" cy="298" r="11"/><circle cx="60" cy="325" r="10"/></g>
+   </svg>
+   <div class="visual-label">🔬 محاكاة بصرية لخَلية وجزيئاتها</div>
+  </div>
+ </section>
+ <section id="quiz" class="glass game hidden" aria-labelledby="quizTitle">
+  <div class="gamehead"><div><div class="step" id="stepNum">المهمة ١ من ١٠</div><h2 id="quizTitle">حلّلي الدليل العلمي</h2></div><div class="scorechip" id="scoreChip">النقاط: ٠ / ١٠</div></div>
+  <div class="track" aria-label="التقدم في اللعبة"><div id="progress" class="fill"></div></div>
+  <div class="questionCard">
+   <div class="qtag" id="qLevel">تحليل</div>
+   <div class="qtext" id="qText"></div>
+   <div id="choices" class="choices" role="group" aria-label="اختاري الإجابة الصحيحة"></div>
+   <div id="feedback" class="feedback" aria-live="polite"></div>
+   <div class="nextrow"><button id="nextBtn" class="primary hidden" type="button">المهمة التالية ←</button><span class="helper" id="helperText">اختاري إجابة واحدة للانتقال إلى التغذية الراجعة.</span></div>
+  </div>
+ </section>
+ <section id="result" class="glass result hidden" aria-labelledby="resultTitle">
+  <div class="resultintro"><div style="font-size:43px">🏅</div><h2 id="resultTitle">أتممتِ رحلة الجزيئات!</h2><p>أحسنتِ إكمال التحديات العلمية، هذه شهادتكِ.</p></div>
+  <div class="statline"><span id="scoreSummary">الدرجة: ٠ / ١٠</span><span id="levelSummary">المستوى: باحثة مجتهدة</span></div>
+  <div id="certificate" class="certificate">
+    <div class="symbol">🏵️</div>
+    <div class="certlabel">مختبر الأحياء التفاعلي • كيمياء الخلية</div>
+    <h3 id="certTitle">شهادة إتمام</h3>
+    <div>تُمنح هذه الشهادة للطالبة</div>
+    <strong class="student" id="certName"></strong>
+    <div class="certtext" id="certText">تقديرًا لإتمامها الرحلة التفاعلية في كيمياء الخلية، وتطبيق مهارات التحليل والتركيب والتفكير العلمي.</div>
+    <div class="resultscore" id="certScore">النتيجة: ٠ من ١٠</div>
+    <div class="certsign"><div>إعداد المعلمة<br><strong>غزوى البقمي</strong></div><div>المرحلة: ثاني ثانوي<br><span id="certDate"></span></div></div>
+  </div>
+  <div class="buttons"><button class="primary" id="printBtn" type="button">🖨️ طباعة / حفظ الشهادة PDF</button><button class="secondary" id="downloadBtn" type="button">⬇️ تنزيل الشهادة كصورة</button><button class="secondary" id="restartBtn" type="button">↻ إعادة اللعبة</button></div>
+ </section>
+ <footer class="footer">إعداد الأستاذة غزوى البقمي • نشاط إثرائي تفاعلي في درس كيمياء الخلية • الأحياء 2-1</footer>
+</main>
+<script>
+"use strict";
+const DATA=[
+{level:"تحليل",title:"شفرة الكربون",q:"لاحظت باحثة أن ذرات الكربون تكوّن سلاسل طويلة وحلقات وجزيئات متفرعة. ما التفسير العلمي الأكثر دقة لهذا التنوع في الجزيئات الحيوية؟",options:["يمتلك الكربون أربعة إلكترونات تكافؤ تمكّنه من تكوين أربع روابط تساهمية بأشكال متنوعة.","يكون الكربون دائمًا روابط أيونية مع ذرات الأكسجين فقط.","تكوّن ذرات الكربون رابطة واحدة فقط في كل جزيء."],answer:0,why:"للكربون أربعة إلكترونات تكافؤ؛ ولذلك يستطيع تكوين أربع روابط تساهمية، بما فيها روابط مع ذرات كربون أخرى، فتتكون هياكل جزيئية متنوعة."},
+{level:"تركيب",title:"بناء الجزيء الكبير",q:"تصمّمين نموذجًا يربط وحدتين من سكر بسيط لتكوين جزيء أكبر. أي تغيير يجب أن يمثّله النموذج حتى يوضح عملية البناء بشكل صحيح؟",options:["إضافة جزيء ماء بين الوحدتين ليمنع اتحادهما.","تكوين رابطة بين الوحدتين مع خروج جزيء ماء.","تحويل الوحدتين مباشرة إلى حمض نووي دون تفاعل."],answer:1,why:"عند اتحاد وحدات السكر في تفاعل نزع الماء تتكون رابطة بينهما ويُطرح جزيء ماء؛ أما التحلل المائي فيستخدم الماء لتفكيك الروابط."},
+{level:"تحليل",title:"جدار النبات",q:"لديك عيّنة من خلايا نباتية تحتاج إلى مركب يدعم الجدار الخلوي ويقاوم الشد. أي الجزيئات تختارين؟",options:["الجليكوجين؛ لأنه مخزون طاقة في الحيوانات.","الدهون الثلاثية؛ لأنها تخزّن الطاقة.","السليلوز؛ لأنه عديد تسكر يكوّن أليافًا داعمة."],answer:2,why:"السليلوز عديد تسكر بنائي يشكل أليافًا قوية في الجدار الخلوي النباتي، بينما يعمل الجليكوجين والدهون أساسًا في تخزين الطاقة."},
+{level:"استدلال",title:"مقارنة الدهون",q:"بقي زيت نباتي سائلًا عند درجة حرارة الغرفة، بينما كانت عينة دهن حيواني أكثر تماسكًا. ما التفسير الجزيئي الأنسب؟",options:["الروابط الثنائية في أحماض دهنية غير مشبعة تحدث انحناءات تقلل تراص الجزيئات.","جزيئات الزيت لا تحتوي مطلقًا على ذرات كربون.","جميع الأحماض الدهنية المشبعة تحتوي روابط ثنائية أكثر."],answer:0,why:"تؤدي الروابط الثنائية، غالبًا من نوع cis، إلى انحناءات في سلاسل الأحماض الدهنية غير المشبعة، فتحد من تراصها وتساعد على سيولتها."},
+{level:"تركيب",title:"هندسة الغشاء",q:"لو وضعتِ جزيئات الدهون المفسفرة في الماء لتصميم غشاء خلوي، فما الترتيب الذي يحافظ على استقرار الطبقة المزدوجة؟",options:["تتجه الذيول الكارهة للماء إلى الخارج والرؤوس إلى الداخل فقط.","تتجه الرؤوس المحبة للماء إلى الوسط المائي على الجانبين، وتختبئ الذيول إلى الداخل.","تنتظم جميع الجزيئات في سلسلة مستقيمة من دون طبقتين."],answer:1,why:"الدهون المفسفرة ثنائية الطبيعة؛ فتواجه رؤوسها المحبة للماء السائل داخل الخلية وخارجها، وتبتعد الذيول الكارهة للماء عن الوسط المائي."},
+{level:"تحليل",title:"البروتين والحرارة",q:"سُخّن إنزيم بروتيني إلى درجة مرتفعة جدًا ثم انخفض نشاطه بشكل كبير. أي تفسير يربط بين تركيب البروتين ووظيفته؟",options:["تزداد دقة الموقع النشط دائمًا مع ارتفاع الحرارة بلا حدود.","يتحوّل الإنزيم إلى جزيء DNA عند التسخين.","قد يتغير شكل البروتين ثلاثي الأبعاد، فيتأثر موقعه النشط وتقل فعاليته."],answer:2,why:"قد تؤدي الحرارة العالية إلى تمسّخ البروتين وتغيّر شكله الفراغي، فيصبح الموقع النشط أقل ملاءمة للمواد المتفاعلة."},
+{level:"تفكير ناقد",title:"قراءة منحنى الطاقة",q:"عرضت تجربتان تفاعلًا واحدًا: الأولى دون إنزيم، والثانية بوجود إنزيم. ظهر في الثانية حاجز طاقة أقل. ما الاستنتاج الدقيق؟",options:["خفض الإنزيم طاقة التنشيط فزاد معدل التفاعل دون تغيير الطاقة الكلية بين المتفاعلات والنواتج.","رفع الإنزيم طاقة التنشيط، لذلك زاد معدل التفاعل.","غيّر الإنزيم طبيعة النواتج إلى عناصر كيميائية جديدة."],answer:0,why:"الإنزيم يوفّر مسارًا أقل في طاقة التنشيط، فيسرّع الوصول إلى النواتج، لكنه لا يغيّر فرق الطاقة بين المتفاعلات والنواتج."},
+{level:"حل مشكلات",title:"حموضة المختبر",q:"إنزيم يعمل بكفاءة عند درجة حموضة محددة. عند تغيير pH بشدة قل نشاطه، رغم ثبات تركيز المادة المتفاعلة. ما الفرضية الأولى التي ينبغي اختبارها؟",options:["تغيّر العدد الذري للعناصر المكوِّنة للإنزيم.","تأثرت شحنات بعض مجموعات البروتين وشكل الموقع النشط.","تحوّل الإنزيم إلى كربوهيدرات لا ترتبط بالمادة المتفاعلة."],answer:1,why:"يمكن أن تغيّر درجة الحموضة شحنات المجموعات الكيميائية والتفاعلات التي تحفظ شكل البروتين، فتضعف قدرة الموقع النشط على أداء وظيفته."},
+{level:"تركيب",title:"رسالة الشفرة الوراثية",q:"تحتاج الخلية إلى نقل المعلومات الوراثية من DNA لاستخدامها في بناء بروتين. أي جزيء يحقق خطوة نقل المعلومات في هذا المسار؟",options:["الدهون المفسفرة التي تبني الغشاء.","السليلوز الذي يدعم الجدار الخلوي.","الحمض النووي الريبوزي الرسول (mRNA) الذي يحمل نسخة من التعليمات."],answer:2,why:"تُنسخ المعلومات من DNA إلى mRNA، ثم تُقرأ رسالة mRNA أثناء ترجمتها لبناء سلسلة من الأحماض الأمينية."},
+{level:"تصميم تجربة",title:"مشروع الباحثة",q:"تريدين اختبار تأثير درجة الحرارة وحدها على نشاط إنزيم. أي تصميم تجريبي يعطي دليلًا أكثر موثوقية؟",options:["تغيير درجة الحرارة فقط بين المجموعات، مع تثبيت pH وتركيز الإنزيم والمادة المتفاعلة وقياس معدل الناتج.","تغيير الحرارة والحموضة وتركيز الإنزيم في كل مجموعة معًا.","قياس لون الأنابيب فقط دون متابعة ناتج التفاعل أو معدل حدوثه."],answer:0,why:"لعزل أثر درجة الحرارة يجب تثبيت المتغيرات الأخرى، ثم قياس معدل التفاعل أو كمية الناتج في مدة محددة، ويفضّل تكرار التجربة."}
+];
+const $=id=>document.getElementById(id);
+let index=0,score=0,chosen=false,student="";
+const digits=n=>String(n).replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[Number(d)]);
+function show(id){["welcome","quiz","result"].forEach(key=>$(key).classList.toggle("hidden",key!==id));window.scrollTo({top:0,behavior:"smooth"})}
+function begin(){
+ const name=$("studentName").value.replace(/\s+/g," ").trim();
+ if(name.length<2){$("nameError").textContent="رجاءً اكتبي اسمكِ قبل بدء التحدي."; $("studentName").focus();return}
+ $("nameError").textContent="";
+ student=name;index=0;score=0;show("quiz");render();
+}
+function render(){
+ chosen=false;
+ const item=DATA[index];
+ $("stepNum").textContent="المهمة "+digits(index+1)+" من "+digits(DATA.length)+" • "+item.title;
+ $("quizTitle").textContent=index===9?"المهمة النهائية: اصنعي الدليل":"حلّلي الدليل العلمي";
+ $("scoreChip").textContent="النقاط: "+digits(score)+" / "+digits(DATA.length);
+ $("progress").style.width=(index/DATA.length*100)+"%";
+ $("qLevel").textContent=item.level;
+ $("qText").textContent=item.q;
+ $("choices").replaceChildren();
+ item.options.forEach((option,i)=>{
+   const button=document.createElement("button");
+   button.type="button";button.className="choice";
+   const letter=document.createElement("span");letter.className="letter";letter.textContent=["أ","ب","ج"][i];
+   const words=document.createElement("span");words.textContent=option;
+   button.append(letter,words);
+   button.addEventListener("click",()=>answer(i));
+   $("choices").appendChild(button);
+ });
+ $("feedback").className="feedback";$("feedback").replaceChildren();
+ $("nextBtn").classList.add("hidden");
+ $("helperText").textContent="اختاري إجابة واحدة للانتقال إلى التغذية الراجعة.";
+ $("nextBtn").textContent=index===DATA.length-1?"عرض شهادتي ✦":"المهمة التالية ←";
+}
+function answer(pick){
+ if(chosen)return;
+ chosen=true;const item=DATA[index],correct=pick===item.answer;
+ if(correct)score++;
+ Array.from($("choices").children).forEach((btn,i)=>{
+   btn.disabled=true;
+   if(i===item.answer)btn.classList.add("correct");
+   if(i===pick&&!correct)btn.classList.add("wrong");
+ });
+ const fb=$("feedback");
+ fb.className="feedback show "+(correct?"good":"bad");
+ const head=document.createElement("strong");head.textContent=correct?"✓ إجابة صحيحة! استدلال علمي متميز.":"✦ محاولة جيدة، لنفهم الإجابة الأدق.";
+ const detail=document.createElement("small");detail.textContent=(correct?"التفسير العلمي: ":"الإجابة الصحيحة: "+["أ","ب","ج"][item.answer]+" — "+item.options[item.answer]+" | التفسير: ")+item.why;
+ fb.append(head,detail);
+ $("scoreChip").textContent="النقاط: "+digits(score)+" / "+digits(DATA.length);
+ $("progress").style.width=((index+1)/DATA.length*100)+"%";
+ $("nextBtn").classList.remove("hidden");
+ $("helperText").textContent="يمكنكِ قراءة التفسير ثم متابعة الرحلة.";
+}
+function finish(){
+ show("result");
+ const excellent=score>=8;
+ $("scoreSummary").textContent="الدرجة: "+digits(score)+" / "+digits(DATA.length);
+ $("levelSummary").textContent="المستوى: "+(score===10?"عالمة الجزيئات":excellent?"باحثة متميزة":"باحثة مثابرة");
+ $("certTitle").textContent=excellent?"شهادة تميّز علمي":"شهادة إتمام";
+ $("certName").textContent=student;
+ $("certText").textContent=excellent?"تقديرًا لتميّزها في إنجاز تحديات كيمياء الخلية وإظهار مهارات التحليل والتركيب والتفكير العلمي.":"تقديرًا لإتمامها تحديات كيمياء الخلية وممارستها مهارات التحليل والتركيب والتفكير العلمي، مع التشجيع على مواصلة التعلّم.";
+ $("certScore").textContent="النتيجة: "+digits(score)+" من "+digits(DATA.length);
+ $("certDate").textContent=new Intl.DateTimeFormat("ar-SA",{day:"numeric",month:"long",year:"numeric"}).format(new Date());
+}
+function xmlSafe(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;")}
+function downloadImage(){
+ const name=xmlSafe(student),heading=xmlSafe($("certTitle").textContent),desc=xmlSafe($("certText").textContent);
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#f7f5ff"/><stop offset="1" stop-color="#f7fffe"/></linearGradient></defs><rect width="1600" height="1000" fill="url(#g)"/><rect x="32" y="32" width="1536" height="936" fill="none" stroke="#c4a76c" stroke-width="14"/><rect x="54" y="54" width="1492" height="892" rx="16" fill="none" stroke="#c9b8de" stroke-width="3"/><text x="800" y="180" text-anchor="middle" fill="#9475ac" font-family="Tahoma,Arial" font-size="33">مختبر الأحياء التفاعلي | كيمياء الخلية</text><text x="800" y="295" text-anchor="middle" fill="#6351a0" font-family="Tahoma,Arial" font-size="81" font-weight="bold">'+heading+'</text><text x="800" y="385" text-anchor="middle" fill="#4c5a76" font-family="Tahoma,Arial" font-size="33">تُمنح هذه الشهادة للطالبة</text><text x="800" y="495" text-anchor="middle" fill="#223c66" font-family="Tahoma,Arial" font-size="63" font-weight="bold">'+name+'</text><foreignObject x="150" y="550" width="1300" height="120"><div xmlns="http://www.w3.org/1999/xhtml" dir="rtl" style="font:31px/1.7 Tahoma,Arial;color:#4e607b;text-align:center">'+desc+'</div></foreignObject><text x="800" y="755" text-anchor="middle" fill="#5546a0" font-family="Tahoma,Arial" font-size="45" font-weight="bold">النتيجة: '+digits(score)+' من '+digits(DATA.length)+'</text><path d="M210 810H1390" stroke="#d2bc87" stroke-width="3"/><text x="1220" y="870" text-anchor="middle" fill="#52647b" font-family="Tahoma,Arial" font-size="32">إعداد المعلمة: غزوى البقمي</text><text x="395" y="870" text-anchor="middle" fill="#52647b" font-family="Tahoma,Arial" font-size="32">الصف: ثاني ثانوي</text></svg>';
+ const blob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"});
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");link.href=url;link.download="شهادة-كيمياء-الخلية.svg";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+$("startBtn").addEventListener("click",begin);
+$("studentName").addEventListener("keydown",e=>{if(e.key==="Enter")begin()});
+$("nextBtn").addEventListener("click",()=>{if(!chosen)return;if(index===DATA.length-1){finish()}else{index++;render();window.scrollTo({top:0,behavior:"smooth"})}});
+$("printBtn").addEventListener("click",()=>window.print());
+$("downloadBtn").addEventListener("click",downloadImage);
+$("restartBtn").addEventListener("click",()=>{index=0;score=0;show("welcome");$("studentName").focus()});
+</script>
+</body>
+</html>
